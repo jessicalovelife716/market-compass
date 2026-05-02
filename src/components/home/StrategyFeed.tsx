@@ -8,7 +8,7 @@ import { SectionTitle } from "@/components/SectionTitle";
 import { BullBearBadge } from "@/components/BullBearBadge";
 import { PriceChange } from "@/components/PriceChange";
 import { cn } from "@/lib/utils";
-import { Search, StarOff, ChevronRight } from "lucide-react";
+import { Search, StarOff } from "lucide-react";
 
 export function StrategyFeed() {
   const navigate = useNavigate();
@@ -142,7 +142,6 @@ function List({
               </div>
             </div>
             <p className="line-clamp-2 text-[12.5px] leading-relaxed text-muted-foreground">{it.comment}</p>
-            <ChevronRight size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground/40" />
           </button>
         );
       })}

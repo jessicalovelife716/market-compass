@@ -21,7 +21,8 @@ const FACTORS: Factor[] = [
 ];
 
 export function MoodThermometer({ mood }: { mood: MarketMood }) {
-  const [expanded, setExpanded] = useState(false);
+  const [verdictExpanded, setVerdictExpanded] = useState(false);
+  const [adviceExpanded, setAdviceExpanded] = useState(false);
   const tone =
     mood.temperature >= 70
       ? { bar: "bg-bull", badge: "bg-bull/15 text-bull" }
@@ -91,32 +92,32 @@ export function MoodThermometer({ mood }: { mood: MarketMood }) {
       <div className="mt-4 space-y-0.5 text-[13px] leading-relaxed">
         <button
           type="button"
-          onClick={() => setExpanded((v) => !v)}
+          onClick={() => setVerdictExpanded((v) => !v)}
           className="flex w-full items-start gap-1 text-left text-foreground/90"
         >
-          <span className={cn("flex-1 min-w-0", !expanded && "truncate")}>
+          <span className={cn("flex-1 min-w-0", !verdictExpanded && "truncate")}>
             <span className="mr-1.5 font-semibold text-brand">引擎裁决</span>
             {mood.verdict}
           </span>
           <ChevronDown
             size={14}
             strokeWidth={1.75}
-            className={cn("mt-1 shrink-0 text-muted-foreground transition-transform", expanded && "rotate-180")}
+            className={cn("mt-1 shrink-0 text-muted-foreground transition-transform", verdictExpanded && "rotate-180")}
           />
         </button>
         <button
           type="button"
-          onClick={() => setExpanded((v) => !v)}
+          onClick={() => setAdviceExpanded((v) => !v)}
           className="flex w-full items-start gap-1 rounded-lg text-left text-foreground bg-inherit border-inherit px-0 py-[4px]"
         >
-          <span className={cn("flex-1 min-w-0", !expanded && "truncate")}>
+          <span className={cn("flex-1 min-w-0", !adviceExpanded && "truncate")}>
             <span className="mr-1.5 font-semibold text-gold">策略建议</span>
             {mood.advice}
           </span>
           <ChevronDown
             size={14}
             strokeWidth={1.75}
-            className={cn("mt-1 shrink-0 text-muted-foreground transition-transform", expanded && "rotate-180")}
+            className={cn("mt-1 shrink-0 text-muted-foreground transition-transform", adviceExpanded && "rotate-180")}
           />
         </button>
       </div>
