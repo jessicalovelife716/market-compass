@@ -1,16 +1,20 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { BottomNav } from "@/components/BottomNav";
+import { MoodThermometer } from "@/components/home/MoodThermometer";
+import { SectorHeatmap } from "@/components/home/SectorHeatmap";
+import { StrategyFeed } from "@/components/home/StrategyFeed";
+import { MARKET_MOOD } from "@/data/marketMood";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+const Index = () => {
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="min-h-screen bg-background pb-20">
+      <div className="mx-auto max-w-md space-y-5 px-4 pt-5">
+        <MoodThermometer mood={MARKET_MOOD} />
+        <SectorHeatmap />
+        <StrategyFeed />
+      </div>
+      <BottomNav />
     </div>
   );
 };
-
-const Index = PlaceholderIndex;
 
 export default Index;
