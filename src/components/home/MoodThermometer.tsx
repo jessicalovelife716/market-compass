@@ -1,8 +1,27 @@
+import { useState } from "react";
 import type { MarketMood } from "@/data/marketMood";
 import { PriceChange } from "@/components/PriceChange";
-import { Activity } from "lucide-react";
+import { Activity, CircleAlert } from "lucide-react";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
+
+interface Factor {
+  key: string;
+  title: string;
+  detail: string;
+  score: number;
+}
+
+const FACTORS: Factor[] = [
+  { key: "ad", title: "涨跌家数", detail: "涨家 2900 / 跌家 1900（占比 60%）", score: 0.6 },
+  { key: "vol", title: "量能", detail: "量比 1.00（7729亿 vs MA20 7729亿）", score: 0.5 },
+  { key: "limit", title: "涨跌停净值", detail: "涨停 62 / 跌停 12", score: 0.9 },
+  { key: "index", title: "大盘指数", detail: "上证 +0.58%", score: 0.6 },
+  { key: "mom", title: "5 日动量", detail: "近 5 日均温 64", score: 0.64 },
+];
 
 export function MoodThermometer({ mood }: { mood: MarketMood }) {
+  const [expanded, setExpanded] = useState(false);
   const tone =
     mood.temperature >= 70
       ? { bar: "bg-bull", badge: "bg-bull/15 text-bull" }
@@ -18,6 +37,36 @@ export function MoodThermometer({ mood }: { mood: MarketMood }) {
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Activity size={14} strokeWidth={1.75} className="text-brand" />
             <span>大盘情绪温度计</span>
+            <Sheet>
+              <SheetTrigger asChild>
+                <button
+                  type="button"
+                  aria-label="温度构成说明"
+                  className="inline-flex h-4 w-4 items-center justify-center text-muted-foreground/70 hover:text-foreground"
+                >
+                  <CircleAlert size={14} strokeWidth={1.5} />
+                </button>
+              </SheetTrigger>
+              <SheetContent side="bottom" className="rounded-t-2xl border-border">
+                <SheetHeader className="text-left">
+                  <SheetTitle>大盘温度构成</SheetTitle>
+                  <SheetDescription>
+                    主要由「涨跌家数」拉动：涨家 2900 / 跌家 1900（占比 60%）。
+                  </SheetDescription>
+                </SheetHeader>
+                <div className="mt-2 divide-y divide-border">
+                  {FACTORS.map((f) => (
+                    <div key={f.key} className="flex items-start justify-between gap-3 py-3">
+                      <div className="min-w-0 flex-1">
+                        <div className="text-[14px] font-semibold text-foreground">{f.title}</div>
+                        <div className="mt-1 text-[12px] text-muted-foreground">{f.detail}</div>
+                      </div>
+                      <div className="num text-[14px] font-semibold text-brand">{f.score.toFixed(f.score >= 1 ? 1 : 2)}</div>
+                    </div>
+                  ))}
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
           <div className="mt-1 flex items-baseline gap-2">
             <span className="num font-semibold text-foreground text-4xl">{mood.temperature}</span>
@@ -40,14 +89,22 @@ export function MoodThermometer({ mood }: { mood: MarketMood }) {
       </div>
 
       <div className="mt-4 space-y-2 text-[13px] leading-relaxed">
-        <p className="text-foreground/90">
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className={cn("block w-full text-left text-foreground/90", !expanded && "truncate")}
+        >
           <span className="mr-1.5 font-semibold text-brand">引擎裁决</span>
           {mood.verdict}
-        </p>
-        <p className="rounded-lg py-2 text-foreground bg-inherit border-inherit px-0">
+        </button>
+        <button
+          type="button"
+          onClick={() => setExpanded((v) => !v)}
+          className={cn("block w-full rounded-lg py-2 text-left text-foreground bg-inherit border-inherit px-0", !expanded && "truncate")}
+        >
           <span className="mr-1.5 font-semibold text-gold">策略建议</span>
           {mood.advice}
-        </p>
+        </button>
       </div>
     </section>
   );
