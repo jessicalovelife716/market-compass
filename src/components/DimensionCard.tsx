@@ -1,5 +1,4 @@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { IconTile } from "./IconTile";
 import { StatusBadge } from "./StatusBadge";
 import type { DimensionResult, StatusKey } from "@/engine/types";
 import { type LucideIcon } from "lucide-react";
@@ -17,17 +16,19 @@ const STATUS_TONE: Record<StatusKey, Tone> = {
 
 export function DimensionCard({
   dim,
-  icon,
+  icon: Icon,
 }: {
   dim: DimensionResult;
   icon: LucideIcon;
 }) {
-  const tone = STATUS_TONE[dim.status];
+  void STATUS_TONE;
   return (
     <AccordionItem value={dim.key} className="surface-card overflow-hidden rounded-xl border border-border">
       <AccordionTrigger className="px-4 py-3 hover:no-underline">
         <div className="flex w-full items-center gap-3">
-          <IconTile icon={icon} tone={tone} size={36} />
+          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-muted-foreground">
+            <Icon size={20} strokeWidth={1.5} />
+          </span>
           <div className="min-w-0 flex-1 text-left">
             <div className="flex items-center gap-2">
               <span className="text-[14px] font-semibold text-foreground">{dim.title}</span>
