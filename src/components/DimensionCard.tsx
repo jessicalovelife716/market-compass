@@ -4,13 +4,14 @@ import { StatusBadge } from "./StatusBadge";
 import type { DimensionResult, StatusKey } from "@/engine/types";
 import { type LucideIcon } from "lucide-react";
 
-const STATUS_TONE: Record<StatusKey, "brand" | "bull" | "warning" | "danger" | "muted" | "gold"> = {
+type Tone = "brand" | "gold" | "bull" | "bear" | "warning" | "danger" | "muted";
+const STATUS_TONE: Record<StatusKey, Tone> = {
   healthy: "bull",
   bullish: "bull",
   strong: "bull",
   warn: "warning",
   danger: "danger",
-  bearish: "bear" as never,
+  bearish: "bear",
   neutral: "muted",
 };
 
