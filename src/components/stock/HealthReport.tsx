@@ -19,7 +19,13 @@ export function HealthReport({ a }: { a: StockAnalysis }) {
       <SectionTitle title="个股体检报告" subtitle="6 大维度 · 点击展开论据" />
       <Accordion type="multiple" className="space-y-2">
         {a.health.map((d) => (
-          <DimensionCard key={d.key} dim={d} icon={ICONS[d.key] ?? Activity} />
+          <DimensionCard
+            key={d.key}
+            dim={d}
+            icon={ICONS[d.key] ?? Activity}
+            titleHref={d.key === "industry" ? `/sector/${a.meta.industryId}` : undefined}
+            titleLabel={d.key === "industry" ? a.meta.industry : undefined}
+          />
         ))}
       </Accordion>
     </section>
