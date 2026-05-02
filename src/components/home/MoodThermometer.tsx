@@ -34,9 +34,9 @@ export function MoodThermometer({ mood }: { mood: MarketMood }) {
     <section className="surface-card rounded-2xl border border-border p-4">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <div className="flex items-center gap-1 text-xs text-muted-foreground">
-            <Activity size={14} strokeWidth={1.75} className="text-brand mr-1" />
-            <span>大盘情绪温度计</span>
+          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+            <Activity size={14} strokeWidth={1.75} className="text-brand" />
+            <span className="mr-0">大盘情绪温度计</span>
             <Sheet>
               <SheetTrigger asChild>
                 <button
