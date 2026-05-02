@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { MarketMood } from "@/data/marketMood";
 import { PriceChange } from "@/components/PriceChange";
-import { Activity, CircleAlert } from "lucide-react";
+import { Activity, CircleAlert, ChevronDown } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
