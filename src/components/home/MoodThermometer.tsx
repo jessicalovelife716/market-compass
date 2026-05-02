@@ -3,6 +3,14 @@ import { PriceChange } from "@/components/PriceChange";
 import { Activity } from "lucide-react";
 
 export function MoodThermometer({ mood }: { mood: MarketMood }) {
+  const tone =
+    mood.temperature >= 70
+      ? { bar: "bg-bull", badge: "bg-bull/15 text-bull" }
+      : mood.temperature >= 50
+      ? { bar: "bg-brand", badge: "bg-brand/15 text-brand" }
+      : mood.temperature >= 30
+      ? { bar: "bg-warning", badge: "bg-warning/15 text-warning" }
+      : { bar: "bg-bear", badge: "bg-bear/15 text-bear" };
   return (
     <section className="surface-card rounded-2xl border border-border p-4">
       <div className="flex items-start justify-between gap-3">
