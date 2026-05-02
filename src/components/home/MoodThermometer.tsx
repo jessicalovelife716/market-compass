@@ -107,7 +107,7 @@ export function MoodThermometer({ mood }: { mood: MarketMood }) {
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className="flex w-full items-start gap-1 rounded-lg py-2 text-left text-foreground bg-inherit border-inherit px-0"
+          className="flex w-full items-start gap-1 rounded-lg text-left text-foreground bg-inherit border-inherit px-0 py-[4px]"
         >
           <span className={cn("flex-1 min-w-0", !expanded && "truncate")}>
             <span className="mr-1.5 font-semibold text-gold">策略建议</span>
