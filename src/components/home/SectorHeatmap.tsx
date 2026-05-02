@@ -15,7 +15,7 @@ export function SectorHeatmap() {
   const navigate = useNavigate();
   return (
     <section>
-      <SectionTitle title="主力资金热力图" subtitle="TOP 4 板块" />
+      <SectionTitle title="主力资金热力图" subtitle="按成交量排序" />
       <div className="grid grid-cols-2 gap-3">
         {ALL_SECTORS.slice(0, 4).map((s) => {
           const m = s.meta;
