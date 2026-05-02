@@ -32,7 +32,7 @@ export function StrategyFeed() {
 
   return (
     <section>
-      <SectionTitle title="策略精选流" subtitle="左右滑动切换不同策略" />
+      <SectionTitle title="策略精选" subtitle="左右滑动切换不同策略" />
       <div className="-mx-4 mb-3 flex items-center gap-2 overflow-x-auto px-4 scrollbar-none">
         {STRATEGY_TABS.map((t, i) => (
           <button
@@ -92,7 +92,7 @@ function FeedList({
       code,
       midLabel: "中线观察",
       shortLabel: "短线观望",
-      comment: "已加入自选，进入详情页查看完整策略推演。",
+      comment: "放量突破前高，主升加速，量价齐升。",
       defenseLabel: "现价",
       defenseValue: STOCKS[code]?.candles.at(-1)?.close ?? 0,
     }));
