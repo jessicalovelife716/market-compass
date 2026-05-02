@@ -12,7 +12,7 @@ export function MoodThermometer({ mood }: { mood: MarketMood }) {
             <span>大盘情绪温度计</span>
           </div>
           <div className="mt-1 flex items-baseline gap-2">
-            <span className="num text-3xl font-semibold text-foreground">{mood.temperature}</span>
+            <span className="num font-semibold text-foreground text-4xl">{mood.temperature}</span>
             <span className="text-sm text-muted-foreground">℃</span>
             <span className="ml-1 inline-flex h-5 items-center rounded-full bg-warning/15 px-2 text-[11px] font-medium text-warning">
               {mood.status}
@@ -36,7 +36,7 @@ export function MoodThermometer({ mood }: { mood: MarketMood }) {
           <span className="mr-1.5 font-semibold text-brand">引擎裁决</span>
           {mood.verdict}
         </p>
-        <p className="rounded-lg bg-brand/8 px-3 py-2 text-foreground/90">
+        <p className="rounded-lg py-2 text-foreground bg-inherit border-inherit px-0">
           <span className="mr-1.5 font-semibold text-gold">策略建议</span>
           {mood.advice}
         </p>
