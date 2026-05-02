@@ -36,13 +36,13 @@ export function MoodThermometer({ mood }: { mood: MarketMood }) {
         <div>
           <div className="flex items-center gap-2 text-xs text-muted-foreground">
             <Activity size={14} strokeWidth={1.75} className="text-brand" />
-            <span className="mr-0">大盘情绪温度计</span>
+            <span>大盘情绪温度计</span>
             <Sheet>
               <SheetTrigger asChild>
                 <button
                   type="button"
                   aria-label="温度构成说明"
-                  className="inline-flex h-4 w-4 items-center justify-center text-muted-foreground/70 hover:text-foreground"
+                  className="-ml-1 inline-flex h-4 w-4 items-center justify-center text-muted-foreground/70 hover:text-foreground"
                 >
                   <CircleAlert size={14} strokeWidth={1.5} />
                 </button>
