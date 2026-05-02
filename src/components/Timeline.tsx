@@ -9,7 +9,7 @@ export function Timeline({ nodes }: { nodes: TimelineNode[] }) {
         <li key={i} className="relative">
           <span
             className={cn(
-              "absolute -left-[16px] top-1.5 inline-block h-1.5 w-1.5 rounded-full ring-2",
+              "absolute -left-[18px] top-1.5 inline-block h-1.5 w-1.5 rounded-full ring-2",
               n.current ? "bg-brand ring-brand/30" : "bg-muted-foreground/40 ring-transparent",
             )}
           />

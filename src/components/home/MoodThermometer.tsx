@@ -1,7 +1,7 @@
 import { useState } from "react";
 import type { MarketMood } from "@/data/marketMood";
 import { PriceChange } from "@/components/PriceChange";
-import { Activity, CircleAlert } from "lucide-react";
+import { Activity, CircleAlert, ChevronDown } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
 
@@ -42,7 +42,7 @@ export function MoodThermometer({ mood }: { mood: MarketMood }) {
                 <button
                   type="button"
                   aria-label="温度构成说明"
-                  className="inline-flex h-4 w-4 items-center justify-center text-muted-foreground/70 hover:text-foreground"
+                  className="-ml-1 inline-flex h-4 w-4 items-center justify-center text-muted-foreground/70 hover:text-foreground"
                 >
                   <CircleAlert size={14} strokeWidth={1.5} />
                 </button>
@@ -88,22 +88,36 @@ export function MoodThermometer({ mood }: { mood: MarketMood }) {
         <div className="absolute top-1/2 h-3 w-[2px] -translate-y-1/2 bg-foreground/80" style={{ left: `${mood.temperature}%` }} />
       </div>
 
-      <div className="mt-4 space-y-2 text-[13px] leading-relaxed">
+      <div className="mt-4 space-y-0.5 text-[13px] leading-relaxed">
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className={cn("block w-full text-left text-foreground/90", !expanded && "truncate")}
+          className="flex w-full items-start gap-1 text-left text-foreground/90"
         >
-          <span className="mr-1.5 font-semibold text-brand">引擎裁决</span>
-          {mood.verdict}
+          <span className={cn("flex-1 min-w-0", !expanded && "truncate")}>
+            <span className="mr-1.5 font-semibold text-brand">引擎裁决</span>
+            {mood.verdict}
+          </span>
+          <ChevronDown
+            size={14}
+            strokeWidth={1.75}
+            className={cn("mt-1 shrink-0 text-muted-foreground transition-transform", expanded && "rotate-180")}
+          />
         </button>
         <button
           type="button"
           onClick={() => setExpanded((v) => !v)}
-          className={cn("block w-full rounded-lg py-2 text-left text-foreground bg-inherit border-inherit px-0", !expanded && "truncate")}
+          className="flex w-full items-start gap-1 rounded-lg py-2 text-left text-foreground bg-inherit border-inherit px-0"
         >
-          <span className="mr-1.5 font-semibold text-gold">策略建议</span>
-          {mood.advice}
+          <span className={cn("flex-1 min-w-0", !expanded && "truncate")}>
+            <span className="mr-1.5 font-semibold text-gold">策略建议</span>
+            {mood.advice}
+          </span>
+          <ChevronDown
+            size={14}
+            strokeWidth={1.75}
+            className={cn("mt-1 shrink-0 text-muted-foreground transition-transform", expanded && "rotate-180")}
+          />
         </button>
       </div>
     </section>
