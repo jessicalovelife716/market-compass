@@ -27,7 +27,7 @@ export function DimensionCard({
     <AccordionItem value={dim.key} className="surface-card overflow-hidden rounded-xl border border-border">
       <AccordionTrigger className="px-4 py-3 hover:no-underline">
         <div className="flex w-full items-center gap-3">
-          <IconTile icon={icon} tone={tone === "bear" ? "bear" : (tone as never)} size={36} />
+          <IconTile icon={icon} tone={tone} size={36} />
           <div className="min-w-0 flex-1 text-left">
             <div className="flex items-center gap-2">
               <span className="text-[14px] font-semibold text-foreground">{dim.title}</span>
