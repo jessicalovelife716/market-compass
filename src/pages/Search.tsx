@@ -61,13 +61,22 @@ const Search = () => {
             <Input
               autoFocus
               value={q}
-              onChange={(e) => setQ(e.target.value)}
+              onChange={(e) => {
+                setQ(e.target.value);
+                if (!e.target.value.trim()) setSubmittedQ("");
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") handleSearch();
+              }}
               placeholder="股票代码 / 拼音首字母 / 板块名称…"
               className="h-9 border-0 bg-surface pl-9 pr-9 text-[13px]"
             />
             {q && (
               <button
-                onClick={() => setQ("")}
+                onClick={() => {
+                  setQ("");
+                  setSubmittedQ("");
+                }}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 <X size={14} strokeWidth={1.75} />
@@ -75,10 +84,10 @@ const Search = () => {
             )}
           </div>
           <button
-            onClick={() => (q ? setQ("") : navigate("/"))}
+            onClick={() => (q.trim() ? handleSearch() : navigate("/"))}
             className="text-[13px] text-brand"
           >
-            取消
+            {q.trim() ? "搜索" : "取消"}
           </button>
         </div>
       </div>
