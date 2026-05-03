@@ -15,27 +15,19 @@ import { cn } from "@/lib/utils";
 const Search = () => {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
-  const [submittedQ, setSubmittedQ] = useState("");
   const { has, toggle } = useWatchlist();
   const { list: history, push, clear } = useSearchHistory();
 
-  const handleSearch = () => {
-    const t = q.trim();
-    if (!t) return;
-    push(t);
-    setSubmittedQ(t);
-  };
-
   const candidates = useMemo(() => {
-    if (!submittedQ.trim()) return [];
-    const t = submittedQ.trim().toLowerCase();
+    if (!q.trim()) return [];
+    const t = q.trim().toLowerCase();
     return ALL_STOCKS.filter(
       (s) =>
         s.meta.code.includes(t) ||
-        s.meta.name.includes(submittedQ.trim()) ||
+        s.meta.name.includes(q.trim()) ||
         s.meta.pinyin.toLowerCase().includes(t),
     ).slice(0, 8);
-  }, [submittedQ]);
+  }, [q]);
 
   const goStock = (code: string, name: string) => {
     push(name);
@@ -61,22 +53,13 @@ const Search = () => {
             <Input
               autoFocus
               value={q}
-              onChange={(e) => {
-                setQ(e.target.value);
-                if (!e.target.value.trim()) setSubmittedQ("");
-              }}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") handleSearch();
-              }}
+              onChange={(e) => setQ(e.target.value)}
               placeholder="股票代码 / 拼音首字母 / 板块名称…"
               className="h-9 border-0 bg-surface pl-9 pr-9 text-[13px]"
             />
             {q && (
               <button
-                onClick={() => {
-                  setQ("");
-                  setSubmittedQ("");
-                }}
+                onClick={() => setQ("")}
                 className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
               >
                 <X size={14} strokeWidth={1.75} />
@@ -84,16 +67,16 @@ const Search = () => {
             )}
           </div>
           <button
-            onClick={() => (q.trim() ? handleSearch() : navigate("/"))}
+            onClick={() => (q ? setQ("") : navigate("/"))}
             className="text-[13px] text-brand"
           >
-            {q.trim() ? "搜索" : "取消"}
+            取消
           </button>
         </div>
       </div>
 
       <div className="mx-auto max-w-md px-4 pt-4">
-        {submittedQ.trim() ? (
+        {q.trim() ? (
           <div className="space-y-2">
             <div className="text-[11px] font-medium text-muted-foreground">股票/板块候选</div>
             {candidates.length === 0 ? (
