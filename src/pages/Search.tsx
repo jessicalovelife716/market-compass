@@ -27,15 +27,15 @@ const Search = () => {
   };
 
   const candidates = useMemo(() => {
-    if (!q.trim()) return [];
-    const t = q.trim().toLowerCase();
+    if (!submittedQ.trim()) return [];
+    const t = submittedQ.trim().toLowerCase();
     return ALL_STOCKS.filter(
       (s) =>
         s.meta.code.includes(t) ||
-        s.meta.name.includes(q.trim()) ||
+        s.meta.name.includes(submittedQ.trim()) ||
         s.meta.pinyin.toLowerCase().includes(t),
     ).slice(0, 8);
-  }, [q]);
+  }, [submittedQ]);
 
   const goStock = (code: string, name: string) => {
     push(name);
