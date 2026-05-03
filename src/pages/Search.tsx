@@ -93,7 +93,7 @@ const Search = () => {
       </div>
 
       <div className="mx-auto max-w-md px-4 pt-4">
-        {q.trim() ? (
+        {submittedQ.trim() ? (
           <div className="space-y-2">
             <div className="text-[11px] font-medium text-muted-foreground">股票/板块候选</div>
             {candidates.length === 0 ? (
