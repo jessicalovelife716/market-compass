@@ -15,8 +15,16 @@ import { cn } from "@/lib/utils";
 const Search = () => {
   const navigate = useNavigate();
   const [q, setQ] = useState("");
+  const [submittedQ, setSubmittedQ] = useState("");
   const { has, toggle } = useWatchlist();
   const { list: history, push, clear } = useSearchHistory();
+
+  const handleSearch = () => {
+    const t = q.trim();
+    if (!t) return;
+    push(t);
+    setSubmittedQ(t);
+  };
 
   const candidates = useMemo(() => {
     if (!q.trim()) return [];
