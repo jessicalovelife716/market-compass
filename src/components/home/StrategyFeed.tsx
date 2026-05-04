@@ -1,16 +1,15 @@
 import { useState, useEffect, useMemo } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import { useNavigate, Link } from "react-router-dom";
-import { toast } from "sonner";
 import { STRATEGY_TABS, FEED_BY_TAB, type StrategyTab } from "@/data/radar";
 import { STOCKS } from "@/data/stocks";
-import { useWatchlist, type WatchSort } from "@/hooks/useWatchlist";
+import { useWatchlist, type WatchSortState, type SortField } from "@/hooks/useWatchlist";
 import { SectionTitle } from "@/components/SectionTitle";
 import { BullBearBadge } from "@/components/BullBearBadge";
 import { PriceChange } from "@/components/PriceChange";
 import { analyzeCard, type CardAnalysis } from "@/engine/rules/card";
 import { cn } from "@/lib/utils";
-import { Search, StarOff, Trash2, ArrowUpDown, Clock } from "lucide-react";
+import { Search, StarOff } from "lucide-react";
 
 export function StrategyFeed() {
   const navigate = useNavigate();
@@ -74,11 +73,89 @@ function FeedList({
   watchlist: string[];
   onClickStock: (code: string) => void;
 }) {
-  const { sort, setSort, remove } = useWatchlist();
+  const { sort, cycleSort } = useWatchlist();
 
   if (tabKey === "watchlist") {
-    if (watchlist.length === 0) {
-      return (
+    return (
+      <WatchlistView
+        watchlist={watchlist}
+        sort={sort}
+        cycleSort={cycleSort}
+        onClickStock={onClickStock}
+      />
+    );
+  }
+
+  // 引擎策略池
+  const items = FEED_BY_TAB[tabKey];
+  return <List codes={items.map((it) => it.code)} onClickStock={onClickStock} />;
+}
+
+interface EnrichedRow {
+  code: string;
+  pct: number;
+  price: number;
+  hasData: boolean;
+}
+
+function WatchlistView({
+  watchlist,
+  sort,
+  cycleSort,
+  onClickStock,
+}: {
+  watchlist: string[];
+  sort: WatchSortState;
+  cycleSort: (f: Exclude<SortField, "default">) => void;
+  onClickStock: (code: string) => void;
+}) {
+  const sorted = useMemo<EnrichedRow[]>(() => {
+    const enriched: EnrichedRow[] = watchlist.map((code) => {
+      const stock = STOCKS[code];
+      const last = stock?.candles.at(-1);
+      const prev = stock?.candles.at(-2);
+      const has = !!last && !!prev;
+      const price = last?.close ?? 0;
+      const pct = has ? ((last!.close - prev!.close) / prev!.close) * 100 : 0;
+      return { code, pct, price, hasData: has };
+    });
+    if (sort.field === "default" || sort.order === "default") {
+      // 最近添加在前
+      return enriched.slice().reverse();
+    }
+    const dir = sort.order === "desc" ? -1 : 1;
+    const key = sort.field === "changePct" ? ("pct" as const) : ("price" as const);
+    return [...enriched].sort((a, b) => {
+      // 缺数据的固定排在最后
+      if (!a.hasData && b.hasData) return 1;
+      if (a.hasData && !b.hasData) return -1;
+      if (!a.hasData && !b.hasData) return 0;
+      return (a[key] - b[key]) * dir;
+    });
+  }, [watchlist, sort]);
+
+  const isEmpty = watchlist.length === 0;
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-[12px] text-muted-foreground">自选（{watchlist.length}只）</span>
+        <div className="flex items-center gap-3">
+          <SortButton
+            label="涨跌幅"
+            active={sort.field === "changePct"}
+            order={sort.field === "changePct" ? sort.order : "default"}
+            onClick={() => cycleSort("changePct")}
+          />
+          <SortButton
+            label="现价"
+            active={sort.field === "price"}
+            order={sort.field === "price" ? sort.order : "default"}
+            onClick={() => cycleSort("price")}
+          />
+        </div>
+      </div>
+      {isEmpty ? (
         <div className="surface-card flex flex-col items-center gap-3 rounded-xl border border-border px-6 py-10 text-center">
           <StarOff size={28} strokeWidth={1.75} className="text-muted-foreground" />
           <p className="text-[13px] text-muted-foreground">您还未添加任何观测标的</p>
@@ -90,89 +167,50 @@ function FeedList({
           </Link>
           <p className="text-[11px] text-muted-foreground/80">或向右滑动查看引擎精选池</p>
         </div>
-      );
-    }
-    return (
-      <WatchlistView
-        watchlist={watchlist}
-        sort={sort}
-        setSort={setSort}
-        remove={(c) => {
-          remove(c);
-          toast.success("已移出自选");
-        }}
-        onClickStock={onClickStock}
-      />
-    );
-  }
-
-  // 引擎策略池：根据 mock pool 计算
-  const items = FEED_BY_TAB[tabKey];
-  return <List codes={items.map((it) => it.code)} onClickStock={onClickStock} />;
+      ) : (
+        <List codes={sorted.map((s) => s.code)} onClickStock={onClickStock} />
+      )}
+    </div>
+  );
 }
 
-function WatchlistView({
-  watchlist,
-  sort,
-  setSort,
-  remove,
-  onClickStock,
+function SortButton({
+  label,
+  active,
+  order,
+  onClick,
 }: {
-  watchlist: string[];
-  sort: WatchSort;
-  setSort: (s: WatchSort) => void;
-  remove: (code: string) => void;
-  onClickStock: (code: string) => void;
+  label: string;
+  active: boolean;
+  order: "default" | "desc" | "asc";
+  onClick: () => void;
 }) {
-  const sorted = useMemo(() => {
-    const enriched = watchlist.map((code) => {
-      const stock = STOCKS[code];
-      const last = stock?.candles.at(-1);
-      const prev = stock?.candles.at(-2);
-      const pct = last && prev ? ((last.close - prev.close) / prev.close) * 100 : 0;
-      return { code, pct };
-    });
-    if (sort === "change_desc") return [...enriched].sort((a, b) => b.pct - a.pct);
-    if (sort === "change_asc") return [...enriched].sort((a, b) => a.pct - b.pct);
-    return enriched.slice().reverse(); // added_desc：最近添加的在前
-  }, [watchlist, sort]);
-
-  const SORT_OPTS: { key: WatchSort; label: string; icon: React.ReactNode }[] = [
-    { key: "added_desc", label: "最近添加", icon: <Clock size={11} /> },
-    { key: "change_desc", label: "涨幅↓", icon: <ArrowUpDown size={11} /> },
-    { key: "change_asc", label: "跌幅↓", icon: <ArrowUpDown size={11} /> },
-  ];
-
+  const upActive = active && order === "asc";
+  const downActive = active && order === "desc";
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-end gap-1">
-        {SORT_OPTS.map((o) => (
-          <button
-            key={o.key}
-            onClick={() => setSort(o.key)}
-            className={cn(
-              "inline-flex items-center gap-1 rounded-full px-2 py-1 text-[11px] transition-colors",
-              sort === o.key ? "bg-brand/15 text-brand" : "text-muted-foreground hover:text-foreground",
-            )}
-          >
-            {o.icon}
-            {o.label}
-          </button>
-        ))}
-      </div>
-      <List codes={sorted.map((s) => s.code)} onClickStock={onClickStock} onRemove={remove} />
-    </div>
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "inline-flex items-center gap-1 text-[12px] transition-colors",
+        active ? "text-brand" : "text-muted-foreground",
+      )}
+    >
+      <span>{label}</span>
+      <span className="flex flex-col leading-none">
+        <span className={cn("text-[8px]", upActive ? "text-brand" : "text-muted-foreground/50")}>▲</span>
+        <span className={cn("-mt-[1px] text-[8px]", downActive ? "text-brand" : "text-muted-foreground/50")}>▼</span>
+      </span>
+    </button>
   );
 }
 
 function List({
   codes,
   onClickStock,
-  onRemove,
 }: {
   codes: string[];
   onClickStock: (code: string) => void;
-  onRemove?: (code: string) => void;
 }) {
   return (
     <div className="space-y-2">
@@ -189,7 +227,6 @@ function List({
             sectorName={stock.meta.industry}
             analysis={analysis}
             onClick={() => onClickStock(code)}
-            onRemove={onRemove ? () => onRemove(code) : undefined}
           />
         );
       })}
@@ -210,75 +247,69 @@ function CardRow({
   sectorName,
   analysis,
   onClick,
-  onRemove,
 }: {
   code: string;
   name: string;
   sectorName: string;
   analysis: CardAnalysis;
   onClick: () => void;
-  onRemove?: () => void;
 }) {
   return (
-    <div className="relative">
-      <button
-        onClick={onClick}
-        className="surface-card flex w-full flex-col gap-2 rounded-xl border border-border p-3 text-left transition-colors hover:border-brand/40"
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="text-[14px] font-semibold text-foreground truncate max-w-[8em]">{name}</span>
-              <span className="num text-[11px] text-muted-foreground">{code}</span>
-            </div>
-            <div className="mt-0.5 text-[11px] text-muted-foreground truncate">{sectorName}</div>
-            <div className="mt-1 flex flex-wrap items-center gap-1.5">
-              {analysis.conclusionTags.map((t, i) => (
-                <span
-                  key={i}
-                  className={cn("inline-flex h-5 items-center rounded-full px-2 text-[11px] font-medium leading-none", STYLE_TO_BADGE[t.style])}
-                >
-                  {t.text}
-                </span>
-              ))}
-              {analysis.keyPrice && (
-                <span className="num inline-flex h-5 items-center rounded-full border border-border bg-muted px-2 text-[11px] font-medium leading-none text-muted-foreground">
-                  {analysis.keyPrice.label}: {analysis.keyPrice.value}
-                </span>
-              )}
-            </div>
+    <button
+      onClick={onClick}
+      className="surface-card flex w-full flex-col gap-2 rounded-xl border border-border p-3 text-left transition-colors hover:border-brand/40 active:bg-muted/40"
+    >
+      {/* Row1: 股票基础信息 */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0">
+          <div className="flex items-baseline gap-2">
+            <span className="truncate max-w-[8em] text-[15px] font-semibold text-foreground">{name}</span>
+            <span className="num text-[12px] text-muted-foreground">{code}</span>
           </div>
-          <div className="text-right">
-            <PriceChange value={analysis.close} pct={analysis.changePct} />
-          </div>
+          <div className="mt-0.5 truncate text-[11px] text-muted-foreground">{sectorName}</div>
         </div>
-        {analysis.signalTags.length > 0 && (
-          <div className="flex flex-wrap items-center gap-1">
-            {analysis.signalTags.map((s, i) => (
-              <span
-                key={i}
-                className="inline-flex h-[18px] items-center rounded bg-surface-2 px-1.5 text-[10px] leading-none text-muted-foreground"
-              >
-                # {s}
-              </span>
-            ))}
-          </div>
+        <div className="text-right">
+          <PriceChange value={analysis.close} pct={analysis.changePct} />
+        </div>
+      </div>
+
+      {/* Row2: 结论标签 + 关键价位 */}
+      <div className="flex flex-wrap items-center gap-1.5">
+        {analysis.conclusionTags.map((t, i) => (
+          <span
+            key={i}
+            className={cn(
+              "inline-flex h-5 items-center rounded-full px-2 text-[11px] font-medium leading-none",
+              STYLE_TO_BADGE[t.style],
+            )}
+          >
+            {t.text}
+          </span>
+        ))}
+        {analysis.keyPrice && (
+          <span className="num inline-flex h-5 items-center rounded-full border border-border bg-muted px-2 text-[11px] font-medium leading-none text-muted-foreground">
+            {analysis.keyPrice.label}: {analysis.keyPrice.value}
+          </span>
         )}
-        <p className="line-clamp-2 text-[12.5px] leading-relaxed text-muted-foreground">{analysis.verdictOneLine}</p>
-      </button>
-      {onRemove && (
-        <button
-          onClick={(e) => {
-            e.stopPropagation();
-            onRemove();
-          }}
-          aria-label="移出自选"
-          className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full text-muted-foreground/70 hover:bg-bear/10 hover:text-bear"
-        >
-          <Trash2 size={14} strokeWidth={1.75} />
-        </button>
+      </div>
+
+      {/* Row3: 信号标签（无信号则不渲染，不占位） */}
+      {analysis.signalTags.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1">
+          {analysis.signalTags.slice(0, 4).map((s, i) => (
+            <span
+              key={i}
+              className="inline-flex h-[18px] items-center rounded bg-surface-2 px-1.5 text-[10px] leading-none text-muted-foreground"
+            >
+              # {s}
+            </span>
+          ))}
+        </div>
       )}
-    </div>
+
+      {/* Row4: 一句话简评 */}
+      <p className="line-clamp-2 text-[12.5px] leading-relaxed text-muted-foreground">{analysis.verdictOneLine}</p>
+    </button>
   );
 }
 
