@@ -257,7 +257,7 @@ function CardRow({
   return (
     <button
       onClick={onClick}
-      className="surface-card flex w-full flex-col gap-1.5 rounded-xl border border-border p-3 text-left transition-colors hover:border-brand/40 active:bg-muted/40"
+      className="surface-card flex w-full flex-col gap-2 rounded-xl border border-border p-3 text-left transition-colors hover:border-brand/40 active:bg-muted/40"
     >
       {/* Row1: 股票基础信息 */}
       <div className="flex items-start justify-between gap-3">
@@ -266,11 +266,14 @@ function CardRow({
             <span className="truncate max-w-[8em] text-[15px] font-semibold text-foreground">{name}</span>
             <span className="num text-[12px] text-muted-foreground">{code}</span>
           </div>
+          <div className="mt-0.5 truncate text-[11px] text-muted-foreground">{sectorName}</div>
         </div>
-        <PriceChange value={analysis.close} pct={analysis.changePct} />
+        <div className="text-right">
+          <PriceChange value={analysis.close} pct={analysis.changePct} />
+        </div>
       </div>
 
-      {/* Row2: 结论标签 + keyPrice */}
+      {/* Row2: 结论标签 + 关键价位 */}
       <div className="flex flex-wrap items-center gap-1.5">
         {analysis.conclusionTags.map((t, i) => (
           <span
@@ -284,10 +287,7 @@ function CardRow({
           </span>
         ))}
         {analysis.keyPrice && (
-          <span
-            className="num inline-flex h-5 items-center rounded-full px-2 text-[11px] font-medium leading-none"
-            style={{ backgroundColor: "#f5f5f5", color: "#888888" }}
-          >
+          <span className="num inline-flex h-5 items-center rounded-full border border-border bg-muted px-2 text-[11px] font-medium leading-none text-muted-foreground">
             {analysis.keyPrice.label}: {analysis.keyPrice.value}
           </span>
         )}
@@ -306,6 +306,9 @@ function CardRow({
           ))}
         </div>
       )}
+
+      {/* Row4: 一句话简评 */}
+      <p className="line-clamp-2 text-[12.5px] leading-relaxed text-muted-foreground">{analysis.verdictOneLine}</p>
     </button>
   );
 }

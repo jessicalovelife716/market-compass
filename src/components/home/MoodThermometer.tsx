@@ -118,7 +118,10 @@ export function MoodThermometer({ mood }: { mood: MarketMood }) {
         </button>
       </div>
 
-      <div className="mt-3 border-t border-border pt-2 text-[10px] leading-[1.5] text-muted-foreground/70">
+      <div className="mt-3 text-[10px] leading-relaxed text-muted-foreground/70">
+        数据来源：东方财富 / 腾讯财经
+      </div>
+      <div className="mt-2 border-t border-border pt-2 text-[10px] leading-[1.5] text-muted-foreground/70">
         以上分析仅基于东方财富、腾讯财经免费数据的技术参考，不构成投资建议。股市有风险，请在第三方券商自主决策执行。
       </div>
     </section>
