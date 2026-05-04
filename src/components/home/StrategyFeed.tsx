@@ -257,7 +257,7 @@ function CardRow({
   return (
     <button
       onClick={onClick}
-      className="surface-card flex w-full flex-col gap-2 rounded-xl border border-border p-3 text-left transition-colors hover:border-brand/40 active:bg-muted/40"
+      className="surface-card flex w-full flex-col gap-1.5 rounded-xl border border-border p-3 text-left transition-colors hover:border-brand/40 active:bg-muted/40"
     >
       {/* Row1: 股票基础信息 */}
       <div className="flex items-start justify-between gap-3">
@@ -267,17 +267,10 @@ function CardRow({
             <span className="num text-[12px] text-muted-foreground">{code}</span>
           </div>
         </div>
-        <div className="flex flex-col items-end gap-0.5">
-          <PriceChange value={analysis.close} pct={analysis.changePct} />
-          {analysis.keyPrice && (
-            <span className="num text-[11px] leading-none text-muted-foreground">
-              {analysis.keyPrice.label}: {analysis.keyPrice.value}
-            </span>
-          )}
-        </div>
+        <PriceChange value={analysis.close} pct={analysis.changePct} />
       </div>
 
-      {/* Row2: 结论标签 */}
+      {/* Row2: 结论标签 + keyPrice */}
       <div className="flex flex-wrap items-center gap-1.5">
         {analysis.conclusionTags.map((t, i) => (
           <span
@@ -290,6 +283,14 @@ function CardRow({
             {t.text}
           </span>
         ))}
+        {analysis.keyPrice && (
+          <span
+            className="num inline-flex h-5 items-center rounded-full px-2 text-[11px] font-medium leading-none"
+            style={{ backgroundColor: "#f5f5f5", color: "#888888" }}
+          >
+            {analysis.keyPrice.label}: {analysis.keyPrice.value}
+          </span>
+        )}
       </div>
 
       {/* Row3: 信号标签（无信号则不渲染，不占位） */}
