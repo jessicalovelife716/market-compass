@@ -4,7 +4,14 @@ const KEY = "watchlist";
 const SORT_KEY = "watchlist:sort";
 export const WATCHLIST_MAX = 50;
 
-export type WatchSort = "added_desc" | "change_desc" | "change_asc";
+// V2.1 排序：两个字段（涨跌幅 / 现价）+ 三态（默认/降序/升序），互斥
+export type SortField = "default" | "changePct" | "price";
+export type SortOrder = "default" | "desc" | "asc";
+export interface WatchSortState {
+  field: SortField;
+  order: SortOrder;
+}
+const DEFAULT_SORT: WatchSortState = { field: "default", order: "default" };
 
 interface AddResult {
   ok: boolean;
@@ -19,9 +26,19 @@ function read(): string[] {
     return [];
   }
 }
-function readSort(): WatchSort {
-  if (typeof window === "undefined") return "added_desc";
-  return (localStorage.getItem(SORT_KEY) as WatchSort) || "added_desc";
+function readSort(): WatchSortState {
+  if (typeof window === "undefined") return DEFAULT_SORT;
+  try {
+    const raw = localStorage.getItem(SORT_KEY);
+    if (!raw) return DEFAULT_SORT;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed === "object" && "field" in parsed && "order" in parsed) {
+      return parsed as WatchSortState;
+    }
+    return DEFAULT_SORT;
+  } catch {
+    return DEFAULT_SORT;
+  }
 }
 
 const listeners = new Set<() => void>();
@@ -45,7 +62,7 @@ let sortCache = readSort();
 
 interface Snapshot {
   list: string[];
-  sort: WatchSort;
+  sort: WatchSortState;
 }
 let snapshot: Snapshot = { list: cache, sort: sortCache };
 function refresh() {
@@ -62,11 +79,19 @@ function write(next: string[]) {
   localStorage.setItem(KEY, JSON.stringify(next));
   emit();
 }
-function writeSort(s: WatchSort) {
+function writeSort(s: WatchSortState) {
   sortCache = s;
   refresh();
-  localStorage.setItem(SORT_KEY, s);
+  if (s.field === "default") localStorage.removeItem(SORT_KEY);
+  else localStorage.setItem(SORT_KEY, JSON.stringify(s));
   emit();
+}
+
+// 三态循环：默认 → 降序 → 升序 → 默认
+function nextOrder(current: SortOrder): SortOrder {
+  if (current === "default") return "desc";
+  if (current === "desc") return "asc";
+  return "default";
 }
 
 export function useWatchlist() {
@@ -91,7 +116,18 @@ export function useWatchlist() {
     write([...cache, code]);
     return { ok: true };
   }, []);
-  const setSort = useCallback((s: WatchSort) => writeSort(s), []);
 
-  return { list: snap.list, sort: snap.sort, has, add, remove, toggle, setSort };
+  // 点击某个排序按钮：互斥 + 三态循环
+  const cycleSort = useCallback((field: Exclude<SortField, "default">) => {
+    const cur = sortCache;
+    if (cur.field !== field) {
+      writeSort({ field, order: "desc" });
+      return;
+    }
+    const next = nextOrder(cur.order);
+    if (next === "default") writeSort(DEFAULT_SORT);
+    else writeSort({ field, order: next });
+  }, []);
+
+  return { list: snap.list, sort: snap.sort, has, add, remove, toggle, cycleSort };
 }
