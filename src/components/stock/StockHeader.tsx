@@ -1,13 +1,23 @@
 import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
+import { toast } from "sonner";
 import type { StockAnalysis } from "@/engine/types";
 import { PriceChange } from "@/components/PriceChange";
-import { useWatchlist } from "@/hooks/useWatchlist";
+import { useWatchlist, WATCHLIST_MAX } from "@/hooks/useWatchlist";
 import { cn } from "@/lib/utils";
 
 export function StockHeader({ a }: { a: StockAnalysis }) {
   const { has, toggle } = useWatchlist();
   const watched = has(a.meta.code);
+  const onToggle = () => {
+    const wasWatched = watched;
+    const r = toggle(a.meta.code);
+    if (!r.ok && r.reason === "limit") {
+      toast.error(`自选最多添加 ${WATCHLIST_MAX} 只，请先移出不需要的股票`);
+    } else if (r.ok) {
+      toast.success(wasWatched ? "已移出自选" : "已加入自选");
+    }
+  };
   const pct = ((a.last.close - a.prev.close) / a.prev.close) * 100;
   return (
     <header className="surface-card rounded-2xl border border-border p-4">
@@ -26,7 +36,7 @@ export function StockHeader({ a }: { a: StockAnalysis }) {
           </div>
         </div>
         <button
-          onClick={() => toggle(a.meta.code)}
+          onClick={onToggle}
           className={cn(
             "flex h-8 items-center gap-1 rounded-full border px-3 text-[12px] transition-colors",
             watched
