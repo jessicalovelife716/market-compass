@@ -266,14 +266,18 @@ function CardRow({
             <span className="truncate max-w-[8em] text-[15px] font-semibold text-foreground">{name}</span>
             <span className="num text-[12px] text-muted-foreground">{code}</span>
           </div>
-          <div className="mt-0.5 truncate text-[11px] text-muted-foreground">{sectorName}</div>
         </div>
-        <div className="text-right">
+        <div className="flex flex-col items-end gap-0.5">
           <PriceChange value={analysis.close} pct={analysis.changePct} />
+          {analysis.keyPrice && (
+            <span className="num text-[11px] leading-none text-muted-foreground">
+              {analysis.keyPrice.label}: {analysis.keyPrice.value}
+            </span>
+          )}
         </div>
       </div>
 
-      {/* Row2: 结论标签 + 关键价位 */}
+      {/* Row2: 结论标签 */}
       <div className="flex flex-wrap items-center gap-1.5">
         {analysis.conclusionTags.map((t, i) => (
           <span
@@ -286,11 +290,6 @@ function CardRow({
             {t.text}
           </span>
         ))}
-        {analysis.keyPrice && (
-          <span className="num inline-flex h-5 items-center rounded-full border border-border bg-muted px-2 text-[11px] font-medium leading-none text-muted-foreground">
-            {analysis.keyPrice.label}: {analysis.keyPrice.value}
-          </span>
-        )}
       </div>
 
       {/* Row3: 信号标签（无信号则不渲染，不占位） */}
@@ -306,9 +305,6 @@ function CardRow({
           ))}
         </div>
       )}
-
-      {/* Row4: 一句话简评 */}
-      <p className="line-clamp-2 text-[12.5px] leading-relaxed text-muted-foreground">{analysis.verdictOneLine}</p>
     </button>
   );
 }
