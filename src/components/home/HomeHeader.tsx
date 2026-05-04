@@ -124,7 +124,7 @@ export function HomeHeader({ onRefresh }: Props) {
   return (
     <header className="flex items-center justify-between gap-3 pt-1">
       <div className="min-w-0">
-        <h1 className="text-[15px] font-semibold tracking-wide text-foreground">Stocklens</h1>
+        <h1 className="tracking-wide text-foreground font-mono font-extrabold text-lg">StockLens</h1>
         <div className={cn("mt-0.5 text-[11px] leading-tight", tsColor)}>
           {lastUpdate ? fmt(lastUpdate) : "数据更新中"}
           {ageHint && <span className="ml-1.5">· {ageHint}</span>}
