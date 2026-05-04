@@ -266,7 +266,7 @@ function CardRow({
             <span className="truncate max-w-[8em] text-[15px] font-semibold text-foreground">{name}</span>
             <span className="num text-[12px] text-muted-foreground">{code}</span>
           </div>
-          <div className="mt-0.5 truncate text-[11px] text-muted-foreground">{sectorName}</div>
+          
         </div>
         <div className="text-right">
           <PriceChange value={analysis.close} pct={analysis.changePct} />
@@ -307,8 +307,6 @@ function CardRow({
         </div>
       )}
 
-      {/* Row4: 一句话简评 */}
-      <p className="line-clamp-2 text-[12.5px] leading-relaxed text-muted-foreground">{analysis.verdictOneLine}</p>
     </button>
   );
 }
